@@ -6,8 +6,7 @@ var Presenter = {
         }
         var doc = Presenter.parser.parseFromString(resource, "application/xml");
         return doc;
-    }
-    , // 2
+    }, // 2
     modalDialogPresenter: function (xml) {
         navigationDocument.presentModal(xml);
     },
@@ -15,16 +14,13 @@ var Presenter = {
     // 3
     pushDocument: function (xml) {
         navigationDocument.pushDocument(xml);
-
     },
-    
-    replaceDocument:function(xml){
-        navigationDocument.replaceDocument(xml);
-        
+
+    replaceDocument: function (xmlToGo, xmlToCome) {
+        navigationDocument.replaceDocument(xmlToGo, xmlToCome);
     },
 
     load: function (event, callback) {
-        //1
         var self = this
             , ele = event.target
             , videoURL = ele.getAttribute("videoURL")
@@ -32,7 +28,6 @@ var Presenter = {
             , page = ele.getAttribute("page")
 
         if (videoURL) {
-            //2
             var player = new Player();
             var playlist = new Playlist();
             var mediaItem = new MediaItem("video", videoURL);
@@ -56,17 +51,19 @@ var Presenter = {
                 }
             }
             var resourceLoader = new ResourceLoader(url);
-
             resourceLoader.getVinePops(page, function () {
                 resourceLoader.loadResource(`${url}templates/LoadingScreenTemplate.xml.js`, function (resource) {
                     var doc = Presenter.makeDocument(resource);
+                    navigationDocument.clear();
                     Presenter.pushDocument(doc);
                 });
             }, function (response) {
                 if (response) {
                     resourceLoader.loadVines(response, function (resource) {
                         var doc = Presenter.makeDocument(resource);
+                        var document = navigationDocument.documents[navigationDocument.documents.length - 1];
                         doc.addEventListener("select", Presenter.load.bind(Presenter));
+                        navigationDocument.clear();
                         Presenter.pushDocument(doc);
                     });
                 }
